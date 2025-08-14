@@ -42,7 +42,7 @@ def fetch():
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
     }
 
-    response = requests.get(url, params=params, headers=headers)
+    response = requests.get(url, params=params, headers=headers, timeout=20)
 
     return response
 
@@ -50,6 +50,9 @@ def fetch():
 def parse(response):
     soup = BeautifulSoup(response.text, "html.parser")
     product = soup.select_one('[data-slug="nothing-buds-2-pro"]')
+    if not product:
+        return "🤔 Could not find product on the page—maybe layout changed?"
+
     is_oos = product.select_one('[alt="out of stock"]')
     display_text = "are out of stock" if is_oos else "are in stock"
     emoji = "🥲" if is_oos else "🎉"
