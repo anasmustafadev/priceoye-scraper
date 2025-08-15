@@ -12,8 +12,8 @@ APP_TOKEN = os.getenv("APP_TOKEN")
 
 def main():
     response = fetch()
-    result = parse(response)
-    sendNotification(result)
+    result, title = parse(response)
+    sendNotification(result, title)
 
 
 def fetch():
@@ -57,10 +57,11 @@ def parse(response):
     display_text = "are out of stock" if is_oos else "are in stock"
     emoji = "🥲" if is_oos else "🎉"
     result = f"{emoji} Nothing Buds 2 Pro {display_text}"
-    return result
+    title = f"[{response.status_code}] Scraped PriceOye!"
+    return result, title
 
 
-def sendNotification(message):
+def sendNotification(message, title):
     conn = http.client.HTTPSConnection("api.pushover.net:443")
     conn.request(
         "POST",
@@ -69,7 +70,7 @@ def sendNotification(message):
             {
                 "token": APP_TOKEN,
                 "user": USER_KEY,
-                "title": "Scraped PriceOye!",
+                "title": title,
                 "message": message,
             }
         ),
